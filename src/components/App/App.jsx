@@ -1,27 +1,18 @@
-import { useState, useEffect } from 'react';
-import { nanoid } from "nanoid";
+import { useSelector, useDispatch } from 'react-redux';
 import ContactForm from '../ContactForm/ContactForm';
 import ContactList from '../ContactList/ContactList';
 import SearchBox from '../SearchBox/SearchBox';
+import { addContact, deleteContact } from '../../redux/contactsSlice';
+import { changeFilter } from '../../redux/filtersSlice';
 
 export default function App() {
-  const [contacts, setContacts] = useState(() => {
-    const savedContacts = JSON.parse(localStorage.getItem('contacts'));
-    return savedContacts ? savedContacts : [];  // Якщо є збережені контакти, то використовуємо їх
-  });
+  const contacts = useSelector(state => state.contacts.items);
+  const filter = useSelector(state => state.filters.name);
+  const dispatch = useDispatch();
 
-  const [filter, setFilter] = useState("");
-
-  // Оновлення localStorage при зміні стану контактів
-  useEffect(() => {
-    if (contacts.length > 0) {
-      localStorage.setItem('contacts', JSON.stringify(contacts));
-    }
-  }, [contacts]);
-
-  const addContact = ({ name, number }) => {
+  const handleAddContact = ({ name, number }) => {
     const duplicate = contacts.find(
-      (contact) => contact.name.toLowerCase() === name.toLowerCase()
+      contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
     if (duplicate) {
@@ -29,32 +20,28 @@ export default function App() {
       return;
     }
 
-    setContacts((prevContacts) => [
-      ...prevContacts,
-      { id: nanoid(), name, number },
-    ]);
+    dispatch(addContact(name, number));
   };
 
-  const handleSearch = (e) => {
-    setFilter(e.target.value.toLowerCase());
+  const handleSearch = e => {
+    dispatch(changeFilter(e.target.value.toLowerCase()));
   };
 
-  const filteredContacts = contacts.filter((contact) =>
+  const handleDeleteContact = id => {
+    dispatch(deleteContact(id));
+  };
+
+  const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter)
   );
-
-  const deleteContact = (id) => {
-    setContacts((prevContacts) =>
-      prevContacts.filter((contact) => contact.id !== id)
-    );
-  };
 
   return (
     <div>
       <h1>Phonebook</h1>
-      <ContactForm onSubmit={addContact} />
+      <ContactForm onSubmit={handleAddContact} />
       <SearchBox value={filter} onChange={handleSearch} />
-      <ContactList contacts={filteredContacts} onDeleteContact={deleteContact} />
+      <ContactList contacts={filteredContacts} onDeleteContact={handleDeleteContact} />
     </div>
   );
 }
+
