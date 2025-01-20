@@ -23,7 +23,7 @@ export default function ContactForm() {
   };
 
   const handleSubmit = (values, { resetForm }) => {
-    dispatch(addContact(values.name, values.number));
+    dispatch(addContact({ name: values.name, number: values.number })); 
     resetForm();
   };
 

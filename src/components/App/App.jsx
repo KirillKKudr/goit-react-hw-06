@@ -3,28 +3,23 @@ import ContactForm from '../ContactForm/ContactForm';
 import ContactList from '../ContactList/ContactList';
 import SearchBox from '../SearchBox/SearchBox';
 import { addContact, deleteContact } from '../../redux/contactsSlice';
-import { changeFilter } from '../../redux/filtersSlice';
 
 export default function App() {
   const contacts = useSelector(state => state.contacts.items);
   const filter = useSelector(state => state.filters.name);
   const dispatch = useDispatch();
 
-  const handleAddContact = ({ name, number }) => {
+  const handleAddContact = (newContact) => {
     const duplicate = contacts.find(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
+      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
     );
 
     if (duplicate) {
-      alert(`${name} is already in contacts.`);
+      alert(`${newContact.name} is already in contacts.`);
       return;
     }
 
-    dispatch(addContact(name, number));
-  };
-
-  const handleSearch = e => {
-    dispatch(changeFilter(e.target.value.toLowerCase()));
+    dispatch(addContact(newContact)); 
   };
 
   const handleDeleteContact = id => {
@@ -39,9 +34,8 @@ export default function App() {
     <div>
       <h1>Phonebook</h1>
       <ContactForm onSubmit={handleAddContact} />
-      <SearchBox value={filter} onChange={handleSearch} />
+      <SearchBox />
       <ContactList contacts={filteredContacts} onDeleteContact={handleDeleteContact} />
     </div>
   );
 }
-
