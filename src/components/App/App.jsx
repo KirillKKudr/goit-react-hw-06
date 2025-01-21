@@ -9,17 +9,17 @@ export default function App() {
   const filter = useSelector(state => state.filters.name);
   const dispatch = useDispatch();
 
-  const handleAddContact = (newContact) => {
+  const handleAddContact = ({ name, number }) => {
     const duplicate = contacts.find(
-      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
+      contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
     if (duplicate) {
-      alert(`${newContact.name} is already in contacts.`);
+      alert(`${name} is already in contacts.`);
       return;
     }
 
-    dispatch(addContact(newContact)); 
+    dispatch(addContact({ name, number }));
   };
 
   const handleDeleteContact = id => {
@@ -27,7 +27,7 @@ export default function App() {
   };
 
   const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter)
+    contact.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
@@ -39,3 +39,4 @@ export default function App() {
     </div>
   );
 }
+
